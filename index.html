@@ -159,7 +159,6 @@ function copyText(button) {
     textarea.select();
     textarea.setSelectionRange(0, 99999); // For mobile devices
     navigator.clipboard.writeText(textarea.value).then(() => {
-        alert("Text copied to clipboard!");
     });
 }
 </script>
