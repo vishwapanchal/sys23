@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Extracted Files</title>
+
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+        line-height: 1.6;
+    }
+    .file-container {
+        margin-bottom: 20px;
+        border: 1px solid #ccc;
+        padding: 15px;
+        border-radius: 5px;
+        background: #f9f9f9;
+    }
+    h2 {
+        margin-top: 0;
+        font-size: 1.5em;
+        color: #333;
+    }
+    button {
+        margin-top: 10px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        padding: 10px 15px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+    button:hover {
+        background-color: #0056b3;
+    }
+    textarea {
+        width: 100%;
+        height: 200px;
+        margin-top: 10px;
+        font-family: monospace;
+    }
+</style>
+</head>
+<body>
+
+<h1>Select a File to View</h1>
+<select id="file-selector" onchange="showFileContent(this.value)">
+    <option value="">--Select a File--</option>
+<option value="ls.txt">ls.txt</option>
+<option value="rm.txt">rm.txt</option>
+<option value="mv.txt">mv.txt</option>
+<option value="cp.txt">cp.txt</option>
+<option value="locks.txt">locks.txt</option>
+<option value="library.txt">library.txt</option>
+<option value="thread_management.txt">thread_management.txt</option>
+<option value="processcontrol.txt">processcontrol.txt</option>
+<option value="reader-writer.txt">reader-writer.txt</option>
+<option value="dinning-philosophers.txt">dinning-philosophers.txt</option>
+<option value="producer-consumer.txt">producer-consumer.txt</option>
+</select>
+<div id='file-display'></div>
+
+<script>
+function showFileContent(fileName) {
+    const fileDisplay = document.getElementById('file-display');
+    fileDisplay.innerHTML = "";
+
+    if (fileName === "ls.txt") {
+        fileDisplay.innerHTML = `
+        <h2>ls.txt</h2>
+        <textarea readonly>$\n    #include<stdio.h>\n    #include<dirent.h>    //handle directory\n    #include<sys/stat.h>  //file info\n    #include<pwd.h>       //user info\n    #include<grp.h>       \n    #include<time.h>\n    \n    int main() {\n    DIR *d;              //directory\n    struct dirent *de;   //directory entry\n    struct stat buf;     //file info\n    int i,j;\n    char P[10]=\"rwxrwxrwx\",AP[10]=\" \";\n    struct passwd *p;\n    struct group *g;\n    struct tm *t;\n    char time[26];\n    d=opendir(\".\");\n    readdir(d);\n    readdir(d);\n    while( (de=readdir(d))!=NULL) //read all entries until end of directory\n    {\n    stat(de->d_name,&buf);\n    // File Type\n    if(S_ISDIR(buf.st_mode))\n    printf(\"d\");\n    else if(S_ISREG(buf.st_mode))\n    printf(\"-\");\n    else if(S_ISCHR(buf.st_mode))\n    printf(\"c\");\n    else if(S_ISBLK(buf.st_mode))\n    printf(\"b\");\n    else if(S_ISLNK(buf.st_mode))\n    printf(\"l\");\n    else if(S_ISFIFO(buf.st_mode))\n    printf(\"p\");\n    else if(S_ISSOCK(buf.st_mode))\n    printf(\"s\");\n    \n    //File Permissions P-Full Permissions AP-Actual Permissions\n    for(i=0,j=(1<<8);i<9;i++,j>>=1)\n    AP[i]= (buf.st_mode & j ) ? P[i] : \'-\' ;\n    printf(\"%s\",AP);\n    \n    //No. of Hard Links\n    printf(\"%5lu\",buf.st_nlink);\n    \n    //User Name\n    p=getpwuid(buf.st_uid);\n    printf(\" %.8s\",p->pw_name);\n    \n    //Group Name\n    g=getgrgid(buf.st_gid);\n    printf(\" %-8.8s\",g->gr_name);\n    \n    //File Size\n    printf(\" %8ld\",buf.st_size);\n    \n    //Date and Time of modification\n    t=localtime(&buf.st_mtime);\n    strftime(time,sizeof(time),\"%b %d %H:%M\",t);\n    printf(\" %s\",time);\n    \n    //File Name\n    printf(\" %s\n\",de->d_name);\n    }\n    \n    }\n\n==========\n=========\n$ gcc lsprogram.c\n$ ./a.out\n\n</textarea>
+        <button onclick="copyText(this)">Copy Text</button>
+        `;
+    }
+    
+    if (fileName === "rm.txt") {
+        fileDisplay.innerHTML = `
+        <h2>rm.txt</h2>
+        <textarea readonly>$\n    #include <stdio.h>\n    #include <stdlib.h>\n    #include <fcntl.h> //file control\n    #include <errno.h>\n    #include <sys/types.h> \n    #include <unistd.h> //file operations\n    \n    int main(int argc, char* argv[]) { \n    int output_fd = unlink(argv[1]);  //unlink to delete the file\n      if(output_fd == -1){\n      perror(\"unlink error\");\n      return 3;\n    }\n    }\n\n==========\n==========\n$ gcc rmprogram.c\n$ ./a.out file1</textarea>
+        <button onclick="copyText(this)">Copy Text</button>
+        `;
+    }
+    
+    if (fileName === "mv.txt") {
+        fileDisplay.innerHTML = `
+        <h2>mv.txt</h2>
+        <textarea readonly>$\n    #include <stdio.h>\n    #include <stdlib.h>\n    #include <fcntl.h> //file control\n    #include <errno.h>\n    #include <sys/types.h> \n    #include <unistd.h> //file operations\n    \n    int main(int argc, char* argv[]) {\n    int input_fd, output_fd; // Input and output file descriptors\n    \n    // Are src and dest file name arguments missing \n    if(argc != 3){\n    printf (\"Usage: mv file1 file2\");\n    return 1;\n    }\n    // Create input file descriptor \n    input_fd = link(argv [1], argv[2]); //creates hard link between source and destination\n    if (input_fd == -1) {\n    perror (\"link error\");\n    return 2;\n    }\n    // Create output file descriptor \n    output_fd = unlink(argv[1]);  //remove source file\n    if(output_fd == -1){\n    perror(\"unlink\");\n    return 3;\n    }\n    \n    }\n\n\n    ===========\n    ===========\n    $ gcc mvprogram.c\n    $ ./a.out file1 file2\n    </textarea>
+        <button onclick="copyText(this)">Copy Text</button>
+        `;
+    }
+    
+    if (fileName === "cp.txt") {
+        fileDisplay.innerHTML = `
+        <h2>cp.txt</h2>
+        <textarea readonly>$\n    #include <stdio.h>\n    #include <stdlib.h>\n    #include <fcntl.h> //file control\n    #include <errno.h>\n    #include <sys/types.h> \n    #include <unistd.h> //file operations\n    \n    #define BUF_SIZE 8192\n    int main(int argc, char* argv[]) {\n    int input_fd, output_fd; //Input and output file descriptors\n    ssize_t ret_in, ret_out; // Number of bytes returned by read() and write() \n    char buffer[BUF_SIZE]; //Character buffer \n    \n    // Are src and dest file name arguments missing \n    if(argc != 3){\n    printf (\"Usage: cp file1 file2\");\n    return 1;\n    }\n    \n    // Create input file descriptor \n    input_fd = open (argv [1], O_RDONLY);  //opens in read-only mode\n    if (input_fd == -1) {\n    perror (\"open\");\n    return 2;\n    }\n    // Create output file descriptor \n    output_fd = open(argv[2], O_WRONLY | O_CREAT, 0644); //opens in write mode, if no file, then creates it\n    if(output_fd == -1){\n      perror(\"open\");\n      return 3;\n    }\n    \n    // Copy process\n    while((ret_in = read (input_fd, &buffer, BUF_SIZE)) > 0){\n    ret_out = write (output_fd, &buffer, (ssize_t) ret_in);\n    if(ret_out != ret_in){\n       /* Write error */\n       perror(\"write\");\n       return 4;\n    }\n    \n    }\n    // Close file descriptors \n    close (input_fd);\n    close (output_fd);\n    return (EXIT_SUCCESS);\n    }\n\n\n    ==========\n    ==========\n    $ gcc cpprogram.c\n    $ ./a.out file1 file2\n    </textarea>
+        <button onclick="copyText(this)">Copy Text</button>
+        `;
+    }
+    
+    if (fileName === "locks.txt") {
+        fileDisplay.innerHTML = `
+        <h2>locks.txt</h2>
+        <textarea readonly>$#include <stdio.h>\n    #include <stdlib.h>\n    #include <unistd.h>\n    #include <fcntl.h> //file control\n    #include <errno.h>\n    \n    int main(int argc,char *argv[]){\n    int fd; //file descriptor to perform operations on file\n    char buffer[255];\n    struct flock fvar; //file lock structure\n    //if src file not specified\n    if(argc==1)\n     {\n       printf(\"usage: %s filename\n\",argv[0]);\n       return -1;\n     }\n    if((fd=open(argv[1],O_RDWR))==-1)\n     {\n      perror(\"open\");\n      exit(1);\n    }\n    \n    fvar.l_type=F_WRLCK; //type- write lock\n    fvar.l_whence=SEEK_END; //relative offset- end of file\n    fvar.l_start=SEEK_END-100; //starting offset\n    fvar.l_len=100; //lock length\n    \n    printf(\"press enter to set lock\n\");\n    getchar();\n    printf(\"trying to get lock..\n\");\n    \n    if((fcntl(fd,F_SETLK,&fvar))==-1)\n    { \n        fcntl(fd,F_GETLK,&fvar);\n        printf(\"\nFile already locked by process (pid): %d\n\",fvar.l_pid);\n        return -1;\n    }\n    printf(\"locked\n\");\n    \n    if((lseek(fd,SEEK_END-50,SEEK_END))==-1){\n      perror(\"lseek\");\n      exit(1);\n    }\n    if((read(fd,buffer,100))==-1)\n    {\n      perror(\"read\");\n      exit(1);\n    }\n    \n    printf(\"data read from file..\n\");\n    puts(buffer);\n    printf(\"press enter to release lock\n\");\n    getchar();\n    \n    fvar.l_type = F_UNLCK; //unlock file\n    fvar.l_whence = SEEK_SET; //reset to beginning of file\n    fvar.l_start = 0;\n    fvar.l_len = 0;\n    \n    if((fcntl(fd,F_UNLCK,&fvar))==-1)\n    {\n    perror(\"fcntl\");\n    exit(0);\n    }\n    \n    printf(\"Unlocked\n\");\n    close(fd);\n    return 0;\n    }\n\n\n\n==========\n==========\n\n $ gcc Filelocks.c\n $ ./a.out filename</textarea>
+        <button onclick="copyText(this)">Copy Text</button>
+        `;
+    }
+    
+    if (fileName === "library.txt") {
+        fileDisplay.innerHTML = `
+        <h2>library.txt</h2>
+        <textarea readonly>$\n    /* add.c */\n    int add(int quant1, int quant2)\n    {\n      return(quant1 + quant2);\n    }\n\n    /* sub.c */\n    int sub(int quant1, int quant2)\n    {\n      return(quant1 - quant2);\n    }\n\n    /* math1.h -library file that contains function declarations */\n    int add(int, int); //adds two integers\n    int sub(int, int); //subtracts second integer from first\n    \n    /* opDemo.c */\n    #include <math1.h>\n    #include <stdio.h>\n \n    int main()\n    {\n     int x,y;\n     printf(\"Enter values for x and y: \");\n     scanf(\"%d %d\",&x,&y);\n     printf(\"%d + %d = %d \n\", x, y, add(x, y));\n     printf(\"%d - %d = %d \n\", x, y, sub(x, y));\n     return 0;\n    }\n    \n    /* Static Linking\n    ar rs libmath1.a add.o sub.o  //link object files to library file (prefix- lib) (extension- .a for static)\n    */\n\n    /* Dynamic Linking \n    gcc -shared -o libmath1.so add.o sub.o //link object files to library file (prefix- lib) (extension- .so for shared)\n    */\n    \n\n\n==========\n==========\n\nstatic linking:\n# Compile the source files with the -I. flag to include math1.h\ngcc -c add.c -I.    # Generates add.o\ngcc -c sub.c -I.    # Generates sub.o\ngcc -c opDemo.c -I. # Generates opDemo.o\n\n# Create the static library\nar rs libmath1.a add.o sub.o\n\n# Link and create the executable\ngcc -o opDemo opDemo.o libmath1.a\n\n# Run the executable\n./opDemo\n\n\nDynamic linking:\n    /* Dynamic Linking */\n    gcc -Wall -fPIC -c add.c\n    gcc -Wall -fPIC -c sub.c\n    gcc -shared -o libmath1.so add.o sub.o\n    gcc -o opDemo opDemo.o libmath1.so \n    ./opDemo</textarea>
+        <button onclick="copyText(this)">Copy Text</button>
+        `;
+    }
+    
+    if (fileName === "thread_management.txt") {
+        fileDisplay.innerHTML = `
+        <h2>thread_management.txt</h2>
+        <textarea readonly>$#include<stdio.h>\n    #include<pthread.h> //handle pthread operations\n    #include<sys/types.h>\n    #include<stdlib.h>\n    #include<unistd.h>\n    #include<math.h>\n    \n    int a[4][4],b[4][4];\n    \n    //thread calling function\n    void *matrixeval (void *val){\n        int *thno = (int*)val;\n        for(int i=0;i<4;i++)\n          b[(*thno)][i]=a[(*thno)][i];\n    \n        for(int i=0;i<4;i++){\n         for(int j=0;j<(*thno);j++)\n          b[(*thno)][i]=b[(*thno)][i]*a[(*thno)][i]; \n          //b matrix stores elements of a matrix raised to power of row number\n        }\n        printf(\"(%d)thread \n\",(*thno+1)); //thread no. for each operation\n    }\n    \n    int main(){\n        pthread_t tid[4];\n        for(int i=0;i<4;i++){\n            printf(\"Enter elements of row %d: \",i+1);\n            for(int j=0;j<4;j++)\n              scanf(\"%d\",&a[i][j]);\n        }\n        printf(\"Before processing: \n\");\n        for(int i=0; i<4;i++){\n            for(int j=0;j<4;j++)\n              printf(\"%d \",a[i][j]);\n            printf(\"\n\");\n        }\n        //Create threads for corresponding row operation\n        for(int i=0;i<4;i++){\n            pthread_create(&tid[i], NULL, matrixeval, (void*)&i); \n            sleep(1); //delay in thread creation\n        }\n        //calling thread waits for threads to terminate\n        for(int i=0;i<4;i++){\n            pthread_join(tid[i], NULL);\n            sleep(1);\n        }\n        printf(\"After processing: \n\");\n        for(int i=0; i<4;i++){\n            for(int j=0;j<4;j++)\n              printf(\"%d \",b[i][j]);\n            printf(\"\n\");\n        }\n        pthread_exit(NULL); //terminates calling thread\n        return 0;\n    }\n\n\n==========\n==========\n$ gcc ThreadManage.c -pthread\n$ ./a.out </textarea>
+        <button onclick="copyText(this)">Copy Text</button>
+        `;
+    }
+    
+    if (fileName === "processcontrol.txt") {
+        fileDisplay.innerHTML = `
+        <h2>processcontrol.txt</h2>
+        <textarea readonly>$#include<stdio.h>\n    #include<string.h>\n    #include<sys/types.h>\n    #include<stdlib.h>\n    #include<unistd.h> //access to POSIX API- ex: getpid(),getppid(),fork()\n    #include<wait.h>\n    \n    int main(int argc, char *argv[]){\n    printf(\"Main Function: \n\");\n    int retval=1;\n    pid_t pid=fork();\n    \n    if(pid<0){\n    printf(\"Error in fork operation\n\");\n    }\n    \n    if(pid==0){\n    printf(\"PID for Child process: %d \nPID of its parent process: %d\n\",getpid(),getppid());\n    execl(\"./binsearch\",argv[1],NULL); //object file of child process program-binsearch.c\n    }\n    \n    else{\n    printf(\"PID of parent process: %d\n\",getpid());\n    wait(&retval); //wait for child process to terminate\n    \n    if(WIFEXITED(retval)==1) //child process exit status\n    {\n    printf(\"Child terminated normally\n\");\n    }\n    else{\n    printf(\"Child terminated abnormally\n\");\n    exit(0);\n    }\n    \n    }\n    return 0;\n    }\n    \n    //Binary search program \'binsearch.c\' in a separate file\n    #include<stdio.h>\n\n    int binarySearch(int arr[], int l, int r, int x)\n    {\n    if (r >= l) {\n    int mid = l + (r - l) / 2;\n    if (arr[mid] == x)\n    return 1;\n    if (arr[mid] > x)\n    return binarySearch(arr, l, mid - 1, x);\n    return binarySearch(arr, mid + 1, r, x);\n    }\n    return -1;\n    }\n    \n    void swap(int *xp, int *yp) {\n    int temp = *xp;\n    *xp = *yp;\n    *yp = temp;\n    }\n    \n    void sort(int arr[], int n) {\n    int i, j;\n    for (i = 0; i < n-1; i++)\n    for (j = 0; j < n-i-1; j++)\n    if (arr[j] > arr[j+1])\n    swap(&arr[j], &arr[j+1]);\n    }\n    \n    int main(){\n    int n,key, arr[10];\n    printf(\"Enter the number of elements in the array: \");\n    scanf(\"%d\",&n);\n    printf(\"Enter the elements: \");\n    for(int i=0;i<n;i++)\n    scanf(\"%d\",&arr[i]);\n    \n    sort(arr,n);\n    printf(\"Enter element to be searched: \");\n    scanf(\"%d\",&key);\n    int result = binarySearch(arr, 0, n - 1, key);\n    if(result==-1)\n    printf(\"Element is not present in array\n\");\n    else\n    printf(\"Element is present\n\");\n    return 0;\n    } \n\n\n==========\n==========\n$ gcc -o binsearch binsearch.c\n$ gcc ProcessControl.c\n$ ./a.out </textarea>
+        <button onclick="copyText(this)">Copy Text</button>
+        `;
+    }
+    
+    if (fileName === "reader-writer.txt") {
+        fileDisplay.innerHTML = `
+        <h2>reader-writer.txt</h2>
+        <textarea readonly>$#include<stdio.h>\n    #include<stdlib.h>\n    #include<pthread.h>\n    #include<semaphore.h> //semaphore operations\n    \n    int count=0,rcount=0; // page no., no. of readers\n    sem_t mutex,wr; \n    \n    void* writer(void *p){\n    int* i =(int*)p;\n    sem_wait(&wr);//blocks writer access to \'count\', until acquire \'wr\'\n    printf(\"\nWriter %d writes page number %d\",*i,++count);\n    sem_post(&wr); //release of \'wr\' semaphore to allow other writer threads\n    }\n    \n    void* reader(void* p){\n    int* i =(int*)p;\n    sem_wait(&mutex);//mutual exclusion to allow only reader to modify \'rcount\' at a time\n    rcount++;\n    if(rcount==1)\n      sem_wait(&wr);//blocks writer access to \'count\', until acquire \'wr\'\n    \n    sem_post(&mutex);//release of \'mutex\' semaphore to allow other reader threads\n    printf(\"\nReader %d reads page number %d \",*i,count);\n    sem_wait(&mutex);//mutual exclusion to allow only reader to modify \'rcount\' at a time\n    rcount--;\n    \n    if(rcount==0)\n      sem_post(&wr);//release of \'wr\' semaphore to allow  writer threads\n    \n    sem_post(&mutex);//release of \'wr\' semaphore to allow other reader threads\n    }\n    \n    int main(){\n    //Initialize semaphores\n    sem_init(&mutex,0,1); \n    sem_init(&wr,0,1); \n    int a[6]={1,2,3,1,2,3};\n    pthread_t p[6];\n    \n    for(int i=0;i<3;i++) pthread_create(&p[i],NULL,writer,&a[i]); //writer threads\n    for(int i=3;i<6;i++) pthread_create(&p[i],NULL,reader,&a[i]); //reader threads\n    for(int i=0;i<6;i++) pthread_join(p[i],NULL);\n    \n    }\n\n\n\n==========\n==========\n$ gcc ReaderWriter.c -pthread\n$ ./a.out</textarea>
+        <button onclick="copyText(this)">Copy Text</button>
+        `;
+    }
+    
+    if (fileName === "dinning-philosophers.txt") {
+        fileDisplay.innerHTML = `
+        <h2>dinning-philosophers.txt</h2>
+        <textarea readonly>$#include <pthread.h>\n    #include <semaphore.h>\n    #include <stdio.h>\n    #include<unistd.h>\n    #define N 5  //number of philosophers\n    #define THINKING 2  //defining states of philosophers\n    #define HUNGRY 1\n    #define EATING 0\n    #define LEFT (phnum + 4) % N \n    #define RIGHT (phnum + 1) % N\n    \n    int state[N];\n    int phil[N] = { 0, 1, 2, 3, 4 }; //ID of philosophers\n    sem_t mutex, S[N]; //sempahores to control synchronisation\n    \n    //check if neighbours are eating\n    void test(int phnum){ \n    if (state[phnum] == HUNGRY && state[LEFT] != EATING && state[RIGHT] != EATING) {\n    state[phnum] = EATING; //change state to eating\n    sleep(2);\n    printf(\"Philosopher %d takes fork %d and %d\n\",phnum + 1, LEFT + 1, phnum + 1);\n    printf(\"Philosopher %d is Eating\n\", phnum + 1);\n    sem_post(&S[phnum]);// used to wake up hungry philosophers during putfork\n    }\n    } \n    \n    // take up chopsticks\n    void take_fork(int phnum){\n    sem_wait(&mutex);//only one philosopher can change state at a time\n    state[phnum] = HUNGRY;// change state to hungry\n    printf(\"Philosopher %d is Hungry\n\", phnum + 1);\n    //eat if neighbours are not eating\n    test(phnum);\n    sem_post(&mutex);\n    sem_wait(&S[phnum]);//if unable to eat wait to be signalled\n    sleep(1);\n    }\n    \n    // put down chopsticks\n    void put_fork(int phnum){\n    sem_wait(&mutex);\n    state[phnum] = THINKING;//change state to thinking\n    printf(\"Philosopher %d putting fork %d and %d down\n\", phnum + 1, LEFT + 1, phnum + 1);\n    printf(\"Philosopher %d is thinking\n\", phnum + 1);\n    //if neigbours can start eating\n    test(LEFT); \n    test(RIGHT);\n    sem_post(&mutex);//\n    }\n    \n    //thread calling function\n    void* philospher(void* num){\n    while (1) {\n    int* i = num;\n    sleep(1);//time spent thinking before eating again\n    take_fork(*i);//decide to eat again\n    sleep(0);\n    put_fork(*i);//finish eating\n    }\n    }\n    \n    int main(){\n    int i;\n    pthread_t thread_id[N];\n    // initialize the semaphores\n    sem_init(&mutex, 0, 1);\n    for (i = 0; i < N; i++)\n     sem_init(&S[i], 0, 0);\n    \n    for (i = 0; i < N; i++) {\n    // create philosopher process threads\n     pthread_create(&thread_id[i], NULL, philospher, &phil[i]);\n     printf(\"Philosopher %d is thinking\n\", i + 1);\n    }\n    for (i = 0; i < N; i++)\n     pthread_join(thread_id[i], NULL);\n    \n    }\n\n\n=========\n=========\n$ gcc DiningPh.c -pthread \n$ ./a.out</textarea>
+        <button onclick="copyText(this)">Copy Text</button>
+        `;
+    }
+    
+    if (fileName === "producer-consumer.txt") {
+        fileDisplay.innerHTML = `
+        <h2>producer-consumer.txt</h2>
+        <textarea readonly>$#include<stdio.h>\n    #include<semaphore.h>\n    #include<pthread.h>\n    #include<stdlib.h>\n    #define buffersize 10\n    \n    pthread_mutex_t mutex;\n    pthread_t tidP[20],tidC[20];//producers,consumers\n    sem_t full,empty;//semaphores to control full/empty state in buffer\n    int counter;//track no. of items in buffer\n    int buffer[buffersize];\n    \n    //Initialize semaphores and mutex variables\n    void initialize(){\n    pthread_mutex_init(&mutex,NULL);\n    sem_init(&full,1,0);\n    sem_init(&empty,1,buffersize);\n    counter=0;\n    }\n     \n    void write(int item){\n      buffer[counter++]=item;\n    }\n    int read(){\n      return(buffer[--counter]);\n    }\n    //Producer process\n    void * producer (void * param){\n    int waittime,item,i;\n    item=rand()%5;\n    waittime=rand()%5;\n    sem_wait(&empty); //if buffer is full, producer waits, by decrementing empty\n    pthread_mutex_lock(&mutex); //mutual exclusion to write to buffer\n    printf(\"\nProducer has produced item: %d\n\",item);\n    write(item);\n    pthread_mutex_unlock(&mutex); //unlock mutex\n    sem_post(&full); //increments full, indicating new item added to buffer\n    }\n    \n    //Consumer process\n    void *consumer (void * param){\n    int waittime,item;\n    waittime=rand()%5;\n    sem_wait(&full);//if buffer is empty, consumer waits\n    pthread_mutex_lock(&mutex); //mutual exclusion to write to buffer\n    item=read();\n    printf(\"\nConsumer has consumed item: %d\n\",item);\n    pthread_mutex_unlock(&mutex); //unlock mutex\n    sem_post(&empty);//increments empty, indicating buffer is no longer full\n    }\n    \n    int main(){\n    int n1,n2,i;\n    initialize();\n    printf(\"\nEnter the no of producers: \");\n    scanf(\"%d\",&n1);\n    printf(\"\nEnter the no of consumers: \");\n    scanf(\"%d\",&n2);\n    for(i=0;i<n1;i++)\n      pthread_create(&tidP[i],NULL,producer,NULL);\n    for(i=0;i<n2;i++)\n      pthread_create(&tidC[i],NULL,consumer,NULL);\n    \n    for(i=0;i<n1;i++)\n      pthread_join(tidP[i],NULL);\n    for(i=0;i<n2;i++)\n      pthread_join(tidC[i],NULL);\n    \n    exit(0);\n    }\n\n\n==========\n==========\n$ gcc ProducerConsumer.c -pthread \n$ ./a.out</textarea>
+        <button onclick="copyText(this)">Copy Text</button>
+        `;
+    }
+    
+}
+function copyText(button) {
+    const textarea = button.previousElementSibling;
+    textarea.select();
+    textarea.setSelectionRange(0, 99999); // For mobile devices
+    navigator.clipboard.writeText(textarea.value).then(() => {
+        alert("Text copied to clipboard!");
+    });
+}
+</script>
+
+</body>
+</html>
